@@ -10,11 +10,15 @@ import Marker from './components/marker';
 class App extends Component {
   //constructor to define STATE containing array of flats
   //when render first time selectedFlat is null
+  //w duplicate the list of flats all Flats so the search have a full array to go back to 
+  // flats is the filter one
  constructor (props){
     super(props);
     this.state ={
      flats: [],
-     selectFlat: null
+     allFlats: [],
+     selectFlat: null,
+     search:""
    };
  }
   //method that using AJAX fetch json and then you can change state and assigned
@@ -25,7 +29,8 @@ componentDidMount(){
    .then(response => response.json())
    .then((data) => {
      this.setState({
-        flats: data
+        flats: data,
+        allFlats: data
      });
    })
 }
@@ -35,11 +40,18 @@ componentDidMount(){
 selectFlat=(flat)=>{
   console.log(flat);
   this.setState({
-    
     selectedFlat: flat
   })
 }
-
+//event that any input in search is called
+//the state of search is change where the value of the input is get
+// we act on the allFlats as a array list of flats that never get destroy on the indexing
+handleSearch = (event) =>{
+  this.setState({
+    search:event.target.value,
+    flats: this.state.allFlats.filter((flat) => new RegExp(event.target.value,"i").exec(flat.name))
+  });
+}
 
   render() {
     // London coordinates for the API GoogleMapReact 
@@ -55,11 +67,18 @@ selectFlat=(flat)=>{
         lng: this.state.selectedFlat.lng
       }
     }
-      
+      // search input... anything is imput handleSearch is called. 
+      //Search in the constructor is empty
     return (
       <div className="app">
         <div className="main">
           <div className="search">
+        
+            <input 
+            type="text"
+            placeholder="Search.."
+            value={this.state.search}
+            onChange={this.handleSearch}/>
           </div>
           <div className="flats">
           
